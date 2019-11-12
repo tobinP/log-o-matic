@@ -1,3 +1,4 @@
-function thing() {
-    let thingo = 'stuff'
+function thing() 
+{
+	let thingo = "stuff";
 }

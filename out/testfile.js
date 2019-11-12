@@ -1,5 +1,5 @@
 "use strict";
 function thing() {
-    let thingo = 'stuff';
+    let thingo = "stuff";
 }
 //# sourceMappingURL=testfile.js.map

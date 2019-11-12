@@ -1,7 +1,8 @@
 {
-	"name": "unendelog",
-	"displayName": "UnEnDeLog",
-	"description": "hello",
+	"name": "log-o-matic",
+	"publisher": "tobin",
+	"displayName": "log-o-matic",
+	"description": "Debug.Log() tool to make your life easier",
 	"version": "0.0.1",
 	"engines": {
 		"vscode": "^1.40.0"
@@ -17,7 +18,7 @@
 		"commands": [
 			{
 				"command": "extension.log",
-				"title": "Hello World"
+				"title": "log"
 			}
 		],
 		"keybindings": {
