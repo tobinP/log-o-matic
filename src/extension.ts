@@ -12,13 +12,22 @@ export function activate(context: vscode.ExtensionContext) {
 
 function doCommand(editor: vscode.TextEditor) {
 	const selectedText = editor.document.getText(editor.selection);
+	const isVariable = checkIfVariable(editor, editor.selection);
 	skipOverOpenCurly(editor);
 	vscode.commands.executeCommand("editor.action.insertLineAfter").then(() => {
 		editor.edit(editBuilder => {
-			addLog(editor, editBuilder, selectedText);
+			addLog(editor, editBuilder, selectedText, isVariable);
 			importUnity(editor, editBuilder);
 		});
 	});
+}
+
+function checkIfVariable(editor: vscode.TextEditor, selection: vscode.Selection): boolean {
+	const position = new vscode.Position(selection.anchor.line, selection.active.character + 1);
+	const range = new vscode.Selection(selection.anchor, position)
+	const selectedText = editor.document.getText(range);
+	const n = selectedText.indexOf("(");
+	return (n === -1)
 }
 
 function skipOverOpenCurly(editor: vscode.TextEditor) {
@@ -40,9 +49,15 @@ function skipOverOpenCurly(editor: vscode.TextEditor) {
 function addLog(
 	editor: vscode.TextEditor,
 	editBuilder: vscode.TextEditorEdit,
-	text: string
+	text: string,
+	isVariable: boolean
 ) {
-	const logStatement = `Debug.Log("&&& ${text}: " + ${text});`;
+	let logStatement: string;
+	if (isVariable) {
+		logStatement = `Debug.Log("&&& ${text}: " + ${text});`;
+	} else {
+		logStatement = `Debug.Log("&&& ${text}");`;
+	}
 	editBuilder.insert(
 		new vscode.Position(
 			editor.selection.active.line,

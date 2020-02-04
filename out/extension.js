@@ -13,13 +13,21 @@ function activate(context) {
 exports.activate = activate;
 function doCommand(editor) {
     const selectedText = editor.document.getText(editor.selection);
+    const isVariable = checkIfVariable(editor, editor.selection);
     skipOverOpenCurly(editor);
     vscode.commands.executeCommand("editor.action.insertLineAfter").then(() => {
         editor.edit(editBuilder => {
-            addLog(editor, editBuilder, selectedText);
+            addLog(editor, editBuilder, selectedText, isVariable);
             importUnity(editor, editBuilder);
         });
     });
+}
+function checkIfVariable(editor, selection) {
+    const position = new vscode.Position(selection.anchor.line, selection.active.character + 1);
+    const range = new vscode.Selection(selection.anchor, position);
+    const selectedText = editor.document.getText(range);
+    const n = selectedText.indexOf("(");
+    return (n === -1);
 }
 function skipOverOpenCurly(editor) {
     var startPosition = editor.selection.active.with(editor.selection.active.line + 1, 0);
@@ -30,8 +38,14 @@ function skipOverOpenCurly(editor) {
         editor.selection = selection;
     }
 }
-function addLog(editor, editBuilder, text) {
-    const logStatement = `Debug.Log("&&& ${text}: " + ${text});`;
+function addLog(editor, editBuilder, text, isVariable) {
+    let logStatement;
+    if (isVariable) {
+        logStatement = `Debug.Log("&&& ${text}: " + ${text});`;
+    }
+    else {
+        logStatement = `Debug.Log("&&& ${text}");`;
+    }
     editBuilder.insert(new vscode.Position(editor.selection.active.line, editor.selection.active.character), logStatement);
 }
 function importUnity(editor, editBuilder) {
