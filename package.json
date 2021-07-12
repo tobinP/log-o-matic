@@ -2,8 +2,8 @@
 	"name": "log-o-matic",
 	"publisher": "tobin",
 	"displayName": "log-o-matic 9000",
-	"description": "Debug.Log() tool to make your life easier",
-	"version": "0.0.1",
+	"description": "console print tool to make your life easier",
+	"version": "1.0.2",
 	"icon": "logo.png",
 	"engines": {
 		"vscode": "^1.40.0"
