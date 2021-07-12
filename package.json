@@ -2,7 +2,7 @@
 	"name": "log-o-matic",
 	"publisher": "tobin",
 	"displayName": "log-o-matic 9000",
-	"description": "Debug.Log() tool to make your life easier",
+	"description": "console print tool to make your life easier",
 	"version": "0.0.1",
 	"icon": "logo.png",
 	"engines": {
