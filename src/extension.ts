@@ -50,7 +50,7 @@ async function getFileType(editor: vscode.TextEditor): Promise<FileType> {
 		return Promise.resolve(FileType.Js);
 	
 	if (langId === 'csharp') {
-		let files = await vscode.workspace.findFiles('packages/manifest.json', undefined, 1)
+		let files = await vscode.workspace.findFiles('Packages/manifest.json', undefined, 1)
 		if (files.length === 0) {
 			return Promise.resolve(FileType.Dotnet);
 		} else {

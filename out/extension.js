@@ -61,7 +61,7 @@ function getFileType(editor) {
         if (langId === 'typescript' || langId === 'javascript')
             return Promise.resolve(FileType.Js);
         if (langId === 'csharp') {
-            let files = yield vscode.workspace.findFiles('packages/manifest.json', undefined, 1);
+            let files = yield vscode.workspace.findFiles('Packages/manifest.json', undefined, 1);
             if (files.length === 0) {
                 return Promise.resolve(FileType.Dotnet);
             }

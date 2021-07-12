@@ -3,7 +3,7 @@
 	"publisher": "tobin",
 	"displayName": "log-o-matic 9000",
 	"description": "console print tool to make your life easier",
-	"version": "1.0.0",
+	"version": "1.0.2",
 	"icon": "logo.png",
 	"engines": {
 		"vscode": "^1.40.0"
