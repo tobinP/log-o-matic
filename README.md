@@ -1,14 +1,14 @@
 # log-o-matic 9000
 
-Tool for logging out variables in Unity, Dotnet, Javascript and Typescript.
+Tool for logging out variables or function names in Unity, Dotnet, Javascript and Typescript.
 
 # How to use
 
-Highlight a variable and press `alt-L` will produce a log like this:
+Highlight a variable and press `alt+L` will produce a log like this:
 
 `Console.WriteLine("&&& myVar: " + myVar);`
 
-Highlight a function name and press `alt-L` will produce a log this:
+Highlight a function name and press `alt+L` will produce a log this:
 
 `Console.WriteLine("&&& myFunction");`
 
