@@ -39,7 +39,7 @@ function doCommand(editor) {
         editor.edit(editBuilder => {
             switch (fileType) {
                 case FileType.Unity:
-                    addLogStatement(editor, editBuilder, "print", selectedText, isVariable);
+                    addLogStatement(editor, editBuilder, "Debug.Log", selectedText, isVariable);
                     addUnityImportStatement(editor, editBuilder);
                     break;
                 case FileType.Dotnet:
