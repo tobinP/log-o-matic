@@ -22,7 +22,7 @@ async function doCommand(editor: vscode.TextEditor): Promise<void> {
 	const isVariable = checkIfVariable(editor, editor.selection);
 	const fileType = await getFileType(editor);
 	if (fileType === FileType.Unknown) return;
-	
+
 	skipOverOpenCurly(editor);
 	await vscode.commands.executeCommand("editor.action.insertLineAfter")
 	editor.edit(editBuilder => {
@@ -45,10 +45,10 @@ async function doCommand(editor: vscode.TextEditor): Promise<void> {
 
 async function getFileType(editor: vscode.TextEditor): Promise<FileType> {
 	let langId = editor.document.languageId
-	
+
 	if (langId === 'typescript' || langId === 'javascript')
 		return Promise.resolve(FileType.Js);
-	
+
 	if (langId === 'csharp') {
 		let files = await vscode.workspace.findFiles('Packages/manifest.json', undefined, 1)
 		if (files.length === 0) {
@@ -57,24 +57,24 @@ async function getFileType(editor: vscode.TextEditor): Promise<FileType> {
 			return Promise.resolve(FileType.Unity);
 		}
 	}
-		
+
 	vscode.window.showInformationMessage(`Unsupported file type`);
 	return Promise.resolve(FileType.Unknown);
 }
 
 function checkIfVariable(editor: vscode.TextEditor, selection: vscode.Selection): boolean {
-	const position = new vscode.Position(selection.anchor.line, selection.active.character + 1);
-	const range = new vscode.Selection(selection.anchor, position)
-	const selectedText = editor.document.getText(range);
-	const n = selectedText.indexOf("(");
-	return (n === -1)
+	const newEndPosition = new vscode.Position(selection.start.line, selection.end.character + 1);
+	const newSelection = new vscode.Selection(selection.start, newEndPosition)
+	const text = editor.document.getText(newSelection);
+	const index = text.indexOf("(");
+	return (index === -1)
 }
 
 function skipOverOpenCurly(editor: vscode.TextEditor): void {
 	var startPosition = editor.selection.active.with(
 		editor.selection.active.line + 1,
 		0
-	); 
+	);
 
 	var endPosition = editor.selection.active.with(
 		editor.selection.active.line + 1,
@@ -119,4 +119,4 @@ function addUnityImportStatement(
 	editBuilder.insert(new vscode.Position(0, 0), importStatement + "\n");
 }
 
-export function deactivate() {}
+export function deactivate() { }

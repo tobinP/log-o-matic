@@ -9,7 +9,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deactivate = exports.activate = void 0;
 const vscode = require("vscode");
 var FileType;
 (function (FileType) {
@@ -74,11 +73,11 @@ function getFileType(editor) {
     });
 }
 function checkIfVariable(editor, selection) {
-    const position = new vscode.Position(selection.anchor.line, selection.active.character + 1);
-    const range = new vscode.Selection(selection.anchor, position);
-    const selectedText = editor.document.getText(range);
-    const n = selectedText.indexOf("(");
-    return (n === -1);
+    const newEndPosition = new vscode.Position(selection.start.line, selection.end.character + 1);
+    const newSelection = new vscode.Selection(selection.start, newEndPosition);
+    const text = editor.document.getText(newSelection);
+    const index = text.indexOf("(");
+    return (index === -1);
 }
 function skipOverOpenCurly(editor) {
     var startPosition = editor.selection.active.with(editor.selection.active.line + 1, 0);
