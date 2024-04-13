@@ -36,7 +36,7 @@ function doCommand(editor) {
             return;
         skipOverOpenCurly(editor);
         yield vscode.commands.executeCommand("editor.action.insertLineAfter");
-        editor.edit(editBuilder => {
+        editor.edit((editBuilder) => {
             switch (fileType) {
                 case FileType.Unity:
                     addLogStatement(editor, editBuilder, "Debug.Log", selectedText, isVariable);
@@ -57,10 +57,10 @@ function doCommand(editor) {
 function getFileType(editor) {
     return __awaiter(this, void 0, void 0, function* () {
         let langId = editor.document.languageId;
-        if (langId === 'typescript' || langId === 'javascript')
+        if (langId === "typescript" || langId === "javascript")
             return Promise.resolve(FileType.Js);
-        if (langId === 'csharp') {
-            let files = yield vscode.workspace.findFiles('Packages/manifest.json', undefined, 1);
+        if (langId === "csharp") {
+            let files = yield vscode.workspace.findFiles("Packages/manifest.json", undefined, 1);
             if (files.length === 0) {
                 return Promise.resolve(FileType.Dotnet);
             }
@@ -76,8 +76,15 @@ function checkIfVariable(editor, selection) {
     const newEndPosition = new vscode.Position(selection.start.line, selection.end.character + 1);
     const newSelection = new vscode.Selection(selection.start, newEndPosition);
     const text = editor.document.getText(newSelection);
+    if (text.length == 0) {
+        return false;
+    }
+    const lastChar = text[text.length - 2];
+    if (lastChar === ")") {
+        return true;
+    }
     const index = text.indexOf("(");
-    return (index === -1);
+    return index === -1;
 }
 function skipOverOpenCurly(editor) {
     var startPosition = editor.selection.active.with(editor.selection.active.line + 1, 0);

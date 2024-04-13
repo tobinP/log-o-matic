@@ -65,6 +65,15 @@ function checkIfVariable(editor: vscode.TextEditor, selection: vscode.Selection)
     const newEndPosition = new vscode.Position(selection.start.line, selection.end.character + 1);
     const newSelection = new vscode.Selection(selection.start, newEndPosition);
     const text = editor.document.getText(newSelection);
+    if (text.length == 0) {
+        return false;
+    }
+
+    const lastChar = text[text.length - 2];
+    if (lastChar === ")") {
+        return true;
+    }
+
     const index = text.indexOf("(");
     return index === -1;
 }
