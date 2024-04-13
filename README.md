@@ -4,11 +4,11 @@ Tool for logging out variables or function names in Unity, Dotnet, Javascript an
 
 # How to use
 
-Highlight a variable and press `alt+L` will produce a log like this:
+Highlight a variable and press `alt+L` to produce a log like this:
 
 `Console.WriteLine("&&& myVar: " + myVar);`
 
-Highlight a function name and press `alt+L` will produce a log this:
+Highlight a function name and press `alt+L` to produce a log this:
 
 `Console.WriteLine("&&& myFunction");`
 

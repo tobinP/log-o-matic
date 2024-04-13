@@ -15,6 +15,32 @@ export function activate(context: vscode.ExtensionContext) {
         doCommand(editor);
         context.subscriptions.push(disposable);
     });
+
+    let disposable2 = vscode.commands.registerCommand("extension.deleteLogs", () => {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) return;
+
+        deleteCommand(editor);
+        context.subscriptions.push(disposable2);
+    });
+}
+
+async function deleteCommand(editor: vscode.TextEditor): Promise<void> {
+    const document = editor.document;
+    const lineCount = document.lineCount;
+
+    editor.edit((editBuilder) => {
+        for (var i = 0; i < lineCount - 1; i++) {
+            const line = document.lineAt(i);
+            const nextLine = document.lineAt(i + 1);
+            const text = line.text;
+            const index = text.indexOf("&&& ");
+            if (index != -1) {
+                var textRange = new vscode.Range(line.range.start, nextLine.range.start);
+                editBuilder.delete(textRange);
+            }
+        }
+    });
 }
 
 async function doCommand(editor: vscode.TextEditor): Promise<void> {

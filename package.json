@@ -15,15 +15,17 @@
 	"categories": [
 		"Other"
 	],
-	"activationEvents": [
-		"onCommand:extension.log"
-	],
+	"activationEvents": [],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
 				"command": "extension.log",
 				"title": "log"
+			},
+			{
+				"command": "extension.deleteLogs",
+				"title": "Delete Logs"
 			}
 		],
 		"keybindings": {
