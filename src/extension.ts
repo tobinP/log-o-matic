@@ -3,6 +3,7 @@ import * as vscode from "vscode";
 enum FileType {
     Unity,
     Dotnet,
+    Godot,
     Js,
     Unknown,
 }
@@ -53,6 +54,9 @@ async function doCommand(editor: vscode.TextEditor): Promise<void> {
     await vscode.commands.executeCommand("editor.action.insertLineAfter");
     editor.edit((editBuilder) => {
         switch (fileType) {
+            case FileType.Godot:
+                addLogStatement(editor, editBuilder, "print", selectedText, isVariable);
+                break;
             case FileType.Unity:
                 addLogStatement(editor, editBuilder, "Debug.Log", selectedText, isVariable);
                 addUnityImportStatement(editor, editBuilder);
@@ -71,6 +75,9 @@ async function doCommand(editor: vscode.TextEditor): Promise<void> {
 
 async function getFileType(editor: vscode.TextEditor): Promise<FileType> {
     let langId = editor.document.languageId;
+    console.log("&&& langId: " + langId);
+
+    if (langId === "gdscript") return Promise.resolve(FileType.Godot);
 
     if (langId === "typescript" || langId === "javascript") return Promise.resolve(FileType.Js);
 

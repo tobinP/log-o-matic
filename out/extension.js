@@ -14,8 +14,9 @@ var FileType;
 (function (FileType) {
     FileType[FileType["Unity"] = 0] = "Unity";
     FileType[FileType["Dotnet"] = 1] = "Dotnet";
-    FileType[FileType["Js"] = 2] = "Js";
-    FileType[FileType["Unknown"] = 3] = "Unknown";
+    FileType[FileType["Godot"] = 2] = "Godot";
+    FileType[FileType["Js"] = 3] = "Js";
+    FileType[FileType["Unknown"] = 4] = "Unknown";
 })(FileType || (FileType = {}));
 function activate(context) {
     let disposable = vscode.commands.registerCommand("extension.log", () => {
@@ -63,6 +64,9 @@ function doCommand(editor) {
         yield vscode.commands.executeCommand("editor.action.insertLineAfter");
         editor.edit((editBuilder) => {
             switch (fileType) {
+                case FileType.Godot:
+                    addLogStatement(editor, editBuilder, "print", selectedText, isVariable);
+                    break;
                 case FileType.Unity:
                     addLogStatement(editor, editBuilder, "Debug.Log", selectedText, isVariable);
                     addUnityImportStatement(editor, editBuilder);
@@ -82,6 +86,9 @@ function doCommand(editor) {
 function getFileType(editor) {
     return __awaiter(this, void 0, void 0, function* () {
         let langId = editor.document.languageId;
+        console.log("&&& langId: " + langId);
+        if (langId === "gdscript")
+            return Promise.resolve(FileType.Godot);
         if (langId === "typescript" || langId === "javascript")
             return Promise.resolve(FileType.Js);
         if (langId === "csharp") {
