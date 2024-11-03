@@ -1,6 +1,6 @@
 # log-o-matic 9000
 
-Tool for logging out variables or function names in Unity, Dotnet, Javascript and Typescript.
+Tool for logging out variables or function names in Godot, Unity, Dotnet, Javascript and Typescript.
 
 # How to use
 
