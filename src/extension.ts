@@ -55,7 +55,7 @@ async function doCommand(editor: vscode.TextEditor): Promise<void> {
     editor.edit((editBuilder) => {
         switch (fileType) {
             case FileType.Godot:
-                addLogStatement(editor, editBuilder, "print", selectedText, isVariable);
+                addLogStatement(editor, editBuilder, "print", selectedText, isVariable, true);
                 break;
             case FileType.Unity:
                 addLogStatement(editor, editBuilder, "Debug.Log", selectedText, isVariable);
@@ -127,11 +127,16 @@ function addLogStatement(
     editBuilder: vscode.TextEditorEdit,
     prefix: string,
     text: string,
-    isVariable: boolean
+    isVariable: boolean,
+    isGodot: boolean = false
 ): void {
     let logStatement: string;
     if (isVariable) {
-        logStatement = `${prefix}("&&& ${text}: " + ${text});`;
+        if (isGodot) {
+            logStatement = `${prefix}("&&& ${text}: ", ${text});`;
+        } else {
+            logStatement = `${prefix}("&&& ${text}: " + ${text});`;
+        }
     } else {
         logStatement = `${prefix}("&&& ${text}");`;
     }

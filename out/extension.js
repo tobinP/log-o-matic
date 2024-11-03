@@ -65,7 +65,7 @@ function doCommand(editor) {
         editor.edit((editBuilder) => {
             switch (fileType) {
                 case FileType.Godot:
-                    addLogStatement(editor, editBuilder, "print", selectedText, isVariable);
+                    addLogStatement(editor, editBuilder, "print", selectedText, isVariable, true);
                     break;
                 case FileType.Unity:
                     addLogStatement(editor, editBuilder, "Debug.Log", selectedText, isVariable);
@@ -127,10 +127,15 @@ function skipOverOpenCurly(editor) {
         editor.selection = selection;
     }
 }
-function addLogStatement(editor, editBuilder, prefix, text, isVariable) {
+function addLogStatement(editor, editBuilder, prefix, text, isVariable, isGodot = false) {
     let logStatement;
     if (isVariable) {
-        logStatement = `${prefix}("&&& ${text}: " + ${text});`;
+        if (isGodot) {
+            logStatement = `${prefix}("&&& ${text}: ", ${text});`;
+        }
+        else {
+            logStatement = `${prefix}("&&& ${text}: " + ${text});`;
+        }
     }
     else {
         logStatement = `${prefix}("&&& ${text}");`;
