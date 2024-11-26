@@ -72,7 +72,10 @@ function doCommand(editor) {
                     addUnityImportStatement(editor, editBuilder);
                     break;
                 case FileType.Dotnet:
-                    addLogStatement(editor, editBuilder, "Console.WriteLine", selectedText, isVariable);
+                    const useDebug = vscode.workspace.getConfiguration().get('log-o-matic.useDebug');
+                    console.log("&&& useDebug: " + useDebug);
+                    const prefix = useDebug ? "Debug.WriteLine" : "Console.WriteLine";
+                    addLogStatement(editor, editBuilder, prefix, selectedText, isVariable);
                     break;
                 case FileType.Js:
                     addLogStatement(editor, editBuilder, "console.log", selectedText, isVariable);
@@ -131,7 +134,7 @@ function addLogStatement(editor, editBuilder, prefix, text, isVariable, isGodot 
     let logStatement;
     if (isVariable) {
         if (isGodot) {
-            logStatement = `${prefix}("&&& ${text}: ", ${text});`;
+            logStatement = `${prefix}("&&& ${text}: ", ${text})`;
         }
         else {
             logStatement = `${prefix}("&&& ${text}: " + ${text});`;
