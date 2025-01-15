@@ -16,7 +16,8 @@ var FileType;
     FileType[FileType["Dotnet"] = 1] = "Dotnet";
     FileType[FileType["Godot"] = 2] = "Godot";
     FileType[FileType["Js"] = 3] = "Js";
-    FileType[FileType["Unknown"] = 4] = "Unknown";
+    FileType[FileType["Cpp"] = 4] = "Cpp";
+    FileType[FileType["Unknown"] = 5] = "Unknown";
 })(FileType || (FileType = {}));
 function activate(context) {
     let disposable = vscode.commands.registerCommand("extension.log", () => {
@@ -57,6 +58,7 @@ function doCommand(editor) {
     return __awaiter(this, void 0, void 0, function* () {
         const selectedText = editor.document.getText(editor.selection);
         const isVariable = checkIfVariable(editor, editor.selection);
+        console.log("&&& isVariable: " + isVariable);
         const fileType = yield getFileType(editor);
         if (fileType === FileType.Unknown)
             return;
@@ -80,6 +82,9 @@ function doCommand(editor) {
                 case FileType.Js:
                     addLogStatement(editor, editBuilder, "console.log", selectedText, isVariable);
                     break;
+                case FileType.Cpp:
+                    addLogStatement(editor, editBuilder, "", selectedText, isVariable, false, true);
+                    break;
                 default:
                     break;
             }
@@ -94,6 +99,8 @@ function getFileType(editor) {
             return Promise.resolve(FileType.Godot);
         if (langId === "typescript" || langId === "javascript")
             return Promise.resolve(FileType.Js);
+        if (langId === "cpp")
+            return Promise.resolve(FileType.Cpp);
         if (langId === "csharp") {
             let files = yield vscode.workspace.findFiles("Packages/manifest.json", undefined, 1);
             if (files.length === 0) {
@@ -119,6 +126,7 @@ function checkIfVariable(editor, selection) {
         return true;
     }
     const index = text.indexOf("(");
+    console.log("&&& isVariable index: " + index);
     return index === -1;
 }
 function skipOverOpenCurly(editor) {
@@ -130,18 +138,22 @@ function skipOverOpenCurly(editor) {
         editor.selection = selection;
     }
 }
-function addLogStatement(editor, editBuilder, prefix, text, isVariable, isGodot = false) {
+function addLogStatement(editor, editBuilder, prefix, text, isVariable, isGodot = false, isCpp = false) {
+    const token = vscode.workspace.getConfiguration().get('log-o-matic.token');
     let logStatement;
     if (isVariable) {
         if (isGodot) {
-            logStatement = `${prefix}("&&& ${text}: ", ${text})`;
+            logStatement = `${prefix}("${token} ${text}: ", ${text})`;
+        }
+        else if (isCpp) {
+            logStatement = `std::cout << \"${token} ${text}: \" << ${text} << std::endl;`;
         }
         else {
-            logStatement = `${prefix}("&&& ${text}: " + ${text});`;
+            logStatement = `${prefix}("${token} ${text}: " + ${text});`;
         }
     }
     else {
-        logStatement = `${prefix}("&&& ${text}");`;
+        logStatement = `${prefix}("${token} ${text}");`;
     }
     editBuilder.insert(new vscode.Position(editor.selection.active.line, editor.selection.active.character), logStatement);
 }

@@ -5,6 +5,7 @@ enum FileType {
     Dotnet,
     Godot,
     Js,
+    Cpp,
     Unknown,
 }
 
@@ -47,6 +48,7 @@ async function deleteCommand(editor: vscode.TextEditor): Promise<void> {
 async function doCommand(editor: vscode.TextEditor): Promise<void> {
     const selectedText = editor.document.getText(editor.selection);
     const isVariable = checkIfVariable(editor, editor.selection);
+    console.log("&&& isVariable: " + isVariable);
     const fileType = await getFileType(editor);
     if (fileType === FileType.Unknown) return;
 
@@ -70,6 +72,9 @@ async function doCommand(editor: vscode.TextEditor): Promise<void> {
             case FileType.Js:
                 addLogStatement(editor, editBuilder, "console.log", selectedText, isVariable);
                 break;
+            case FileType.Cpp:
+                addLogStatement(editor, editBuilder, "", selectedText, isVariable, false, true);
+                break;
             default:
                 break;
         }
@@ -83,6 +88,8 @@ async function getFileType(editor: vscode.TextEditor): Promise<FileType> {
     if (langId === "gdscript") return Promise.resolve(FileType.Godot);
 
     if (langId === "typescript" || langId === "javascript") return Promise.resolve(FileType.Js);
+
+    if (langId === "cpp") return Promise.resolve(FileType.Cpp);
 
     if (langId === "csharp") {
         let files = await vscode.workspace.findFiles("Packages/manifest.json", undefined, 1);
@@ -111,6 +118,7 @@ function checkIfVariable(editor: vscode.TextEditor, selection: vscode.Selection)
     }
 
     const index = text.indexOf("(");
+    console.log("&&& isVariable index: " + index);
     return index === -1;
 }
 
@@ -131,17 +139,21 @@ function addLogStatement(
     prefix: string,
     text: string,
     isVariable: boolean,
-    isGodot: boolean = false
+    isGodot: boolean = false,
+    isCpp: boolean = false
 ): void {
+    const token = vscode.workspace.getConfiguration().get('log-o-matic.token');
     let logStatement: string;
     if (isVariable) {
         if (isGodot) {
-            logStatement = `${prefix}("&&& ${text}: ", ${text})`;
+            logStatement = `${prefix}("${token} ${text}: ", ${text})`;
+        } else if(isCpp) {
+            logStatement = `std::cout << \"${token} ${text}: \" << ${text} << std::endl;`
         } else {
-            logStatement = `${prefix}("&&& ${text}: " + ${text});`;
+            logStatement = `${prefix}("${token} ${text}: " + ${text});`;
         }
     } else {
-        logStatement = `${prefix}("&&& ${text}");`;
+        logStatement = `${prefix}("${token} ${text}");`;
     }
     editBuilder.insert(
         new vscode.Position(editor.selection.active.line, editor.selection.active.character),

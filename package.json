@@ -39,6 +39,16 @@
 					"type": "boolean",
 					"default": false,
 					"description": "Use `Debug.WriteLine()` instead of `Console.WriteLine()`"
+				},
+				"log-o-matic.token": {
+					"type": "string",
+					"default": "&&&",
+					"description": "Choose the character sequence to be used as token identifier"
+				},
+				"log-o-matic.custom-format": {
+					"type": "string",
+					"default": "",
+					"description": "Make a custom log statement such as `myCustomPrint()"
 				}
 			}
 		}
