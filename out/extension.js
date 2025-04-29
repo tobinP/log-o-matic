@@ -17,7 +17,8 @@ var FileType;
     FileType[FileType["Godot"] = 2] = "Godot";
     FileType[FileType["Js"] = 3] = "Js";
     FileType[FileType["Cpp"] = 4] = "Cpp";
-    FileType[FileType["Unknown"] = 5] = "Unknown";
+    FileType[FileType["Rust"] = 5] = "Rust";
+    FileType[FileType["Unknown"] = 6] = "Unknown";
 })(FileType || (FileType = {}));
 function activate(context) {
     let disposable = vscode.commands.registerCommand("extension.log", () => {
@@ -83,6 +84,9 @@ function createLogStatement(editor) {
                 case FileType.Cpp:
                     insertLogIntoEditor(editor, editBuilder, "", selectedText, isVariable, fileType);
                     break;
+                case FileType.Rust:
+                    insertLogIntoEditor(editor, editBuilder, "println!", selectedText, isVariable, fileType);
+                    break;
                 default:
                     break;
             }
@@ -92,12 +96,15 @@ function createLogStatement(editor) {
 function getFileType(editor) {
     return __awaiter(this, void 0, void 0, function* () {
         let langId = editor.document.languageId;
+        console.log("&&& langId: " + langId);
         if (langId === "gdscript")
             return Promise.resolve(FileType.Godot);
         if (langId === "typescript" || langId === "javascript")
             return Promise.resolve(FileType.Js);
         if (langId === "cpp")
             return Promise.resolve(FileType.Cpp);
+        if (langId === "rust")
+            return Promise.resolve(FileType.Rust);
         if (langId === "csharp") {
             let files = yield vscode.workspace.findFiles("Packages/manifest.json", undefined, 1);
             if (files.length === 0) {
@@ -145,6 +152,9 @@ function insertLogIntoEditor(editor, editBuilder, methodName, text, isVariable, 
                 break;
             case FileType.Cpp:
                 logStatement = `std::cout << \"${token} ${text}: \" << ${text} << std::endl;`;
+                break;
+            case FileType.Rust:
+                logStatement = `${methodName}("${token} ${text}: {${text}}")`;
                 break;
             default:
                 logStatement = `${methodName}("${token} ${text}: " + ${text});`;

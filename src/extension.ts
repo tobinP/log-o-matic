@@ -6,6 +6,7 @@ enum FileType {
     Godot,
     Js,
     Cpp,
+    Rust,
     Unknown,
 }
 
@@ -73,6 +74,9 @@ async function createLogStatement(editor: vscode.TextEditor): Promise<void> {
             case FileType.Cpp:
                 insertLogIntoEditor(editor, editBuilder, "", selectedText, isVariable, fileType);
                 break;
+            case FileType.Rust:
+                insertLogIntoEditor(editor, editBuilder, "println!", selectedText, isVariable, fileType);
+                break;
             default:
                 break;
         }
@@ -81,12 +85,15 @@ async function createLogStatement(editor: vscode.TextEditor): Promise<void> {
 
 async function getFileType(editor: vscode.TextEditor): Promise<FileType> {
     let langId = editor.document.languageId;
+    console.log("&&& langId: " + langId);
 
     if (langId === "gdscript") return Promise.resolve(FileType.Godot);
 
     if (langId === "typescript" || langId === "javascript") return Promise.resolve(FileType.Js);
 
     if (langId === "cpp") return Promise.resolve(FileType.Cpp);
+
+    if (langId === "rust") return Promise.resolve(FileType.Rust);
 
     if (langId === "csharp") {
         let files = await vscode.workspace.findFiles("Packages/manifest.json", undefined, 1);
@@ -149,6 +156,9 @@ function insertLogIntoEditor(
                 break;
             case FileType.Cpp:
                 logStatement = `std::cout << \"${token} ${text}: \" << ${text} << std::endl;`
+                break;
+            case FileType.Rust:
+                logStatement = `${methodName}("${token} ${text}: {${text}}")`
                 break;
             default:
                 logStatement = `${methodName}("${token} ${text}: " + ${text});`;
