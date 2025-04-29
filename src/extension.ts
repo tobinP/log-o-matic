@@ -157,7 +157,7 @@ function insertLogIntoEditor(
                 logStatement = `std::cout << \"${token} ${text}: \" << ${text} << std::endl;`
                 break;
             case FileType.Rust:
-                logStatement = `${methodName}("${token} ${text}: {${text}}")`
+                logStatement = `${methodName}("${token} ${text}: {${text}}");`
                 break;
             default:
                 logStatement = `${methodName}("${token} ${text}: " + ${text});`;
