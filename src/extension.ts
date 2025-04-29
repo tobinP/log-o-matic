@@ -14,7 +14,7 @@ export function activate(context: vscode.ExtensionContext) {
         const editor = vscode.window.activeTextEditor;
         if (!editor) return;
 
-        doCommand(editor);
+        createLogStatement(editor);
         context.subscriptions.push(disposable);
     });
 
@@ -22,12 +22,12 @@ export function activate(context: vscode.ExtensionContext) {
         const editor = vscode.window.activeTextEditor;
         if (!editor) return;
 
-        deleteCommand(editor);
+        deleteAllLogs(editor);
         context.subscriptions.push(disposable2);
     });
 }
 
-async function deleteCommand(editor: vscode.TextEditor): Promise<void> {
+async function deleteAllLogs(editor: vscode.TextEditor): Promise<void> {
     const document = editor.document;
     const lineCount = document.lineCount;
 
@@ -45,10 +45,9 @@ async function deleteCommand(editor: vscode.TextEditor): Promise<void> {
     });
 }
 
-async function doCommand(editor: vscode.TextEditor): Promise<void> {
+async function createLogStatement(editor: vscode.TextEditor): Promise<void> {
     const selectedText = editor.document.getText(editor.selection);
     const isVariable = checkIfVariable(editor, editor.selection);
-    console.log("&&& isVariable: " + isVariable);
     const fileType = await getFileType(editor);
     if (fileType === FileType.Unknown) return;
 
@@ -57,23 +56,22 @@ async function doCommand(editor: vscode.TextEditor): Promise<void> {
     editor.edit((editBuilder) => {
         switch (fileType) {
             case FileType.Godot:
-                addLogStatement(editor, editBuilder, "print", selectedText, isVariable, true);
+                insertLogIntoEditor(editor, editBuilder, "print", selectedText, isVariable, fileType);
                 break;
             case FileType.Unity:
-                addLogStatement(editor, editBuilder, "Debug.Log", selectedText, isVariable);
+                insertLogIntoEditor(editor, editBuilder, "Debug.Log", selectedText, isVariable, fileType);
                 addUnityImportStatement(editor, editBuilder);
                 break;
             case FileType.Dotnet:
                 const useDebug = vscode.workspace.getConfiguration().get('log-o-matic.useDebug');
-                console.log("&&& useDebug: " + useDebug);
                 const prefix = useDebug ? "Debug.WriteLine" : "Console.WriteLine";
-                addLogStatement(editor, editBuilder, prefix, selectedText, isVariable);
+                insertLogIntoEditor(editor, editBuilder, prefix, selectedText, isVariable, fileType);
                 break;
             case FileType.Js:
-                addLogStatement(editor, editBuilder, "console.log", selectedText, isVariable);
+                insertLogIntoEditor(editor, editBuilder, "console.log", selectedText, isVariable, fileType);
                 break;
             case FileType.Cpp:
-                addLogStatement(editor, editBuilder, "", selectedText, isVariable, false, true);
+                insertLogIntoEditor(editor, editBuilder, "", selectedText, isVariable, fileType);
                 break;
             default:
                 break;
@@ -83,7 +81,6 @@ async function doCommand(editor: vscode.TextEditor): Promise<void> {
 
 async function getFileType(editor: vscode.TextEditor): Promise<FileType> {
     let langId = editor.document.languageId;
-    console.log("&&& langId: " + langId);
 
     if (langId === "gdscript") return Promise.resolve(FileType.Godot);
 
@@ -118,7 +115,6 @@ function checkIfVariable(editor: vscode.TextEditor, selection: vscode.Selection)
     }
 
     const index = text.indexOf("(");
-    console.log("&&& isVariable index: " + index);
     return index === -1;
 }
 
@@ -133,27 +129,33 @@ function skipOverOpenCurly(editor: vscode.TextEditor): void {
     }
 }
 
-function addLogStatement(
+function insertLogIntoEditor(
     editor: vscode.TextEditor,
     editBuilder: vscode.TextEditorEdit,
-    prefix: string,
+    methodName: string,
     text: string,
     isVariable: boolean,
-    isGodot: boolean = false,
-    isCpp: boolean = false
+    fileType: FileType
 ): void {
     const token = vscode.workspace.getConfiguration().get('log-o-matic.token');
+
+    // println!("format {local_variable} arguments");
+
     let logStatement: string;
     if (isVariable) {
-        if (isGodot) {
-            logStatement = `${prefix}("${token} ${text}: ", ${text})`;
-        } else if(isCpp) {
-            logStatement = `std::cout << \"${token} ${text}: \" << ${text} << std::endl;`
-        } else {
-            logStatement = `${prefix}("${token} ${text}: " + ${text});`;
+        switch (fileType) {
+            case FileType.Godot:
+                logStatement = `${methodName}("${token} ${text}: ", ${text})`;
+                break;
+            case FileType.Cpp:
+                logStatement = `std::cout << \"${token} ${text}: \" << ${text} << std::endl;`
+                break;
+            default:
+                logStatement = `${methodName}("${token} ${text}: " + ${text});`;
+                break;
         }
     } else {
-        logStatement = `${prefix}("${token} ${text}");`;
+        logStatement = `${methodName}("${token} ${text}");`;
     }
     editBuilder.insert(
         new vscode.Position(editor.selection.active.line, editor.selection.active.character),
@@ -171,4 +173,4 @@ function addUnityImportStatement(
     editBuilder.insert(new vscode.Position(0, 0), importStatement + "\n");
 }
 
-export function deactivate() {}
+export function deactivate() { }
