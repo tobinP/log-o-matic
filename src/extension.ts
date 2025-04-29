@@ -85,7 +85,6 @@ async function createLogStatement(editor: vscode.TextEditor): Promise<void> {
 
 async function getFileType(editor: vscode.TextEditor): Promise<FileType> {
     let langId = editor.document.languageId;
-    console.log("&&& langId: " + langId);
 
     if (langId === "gdscript") return Promise.resolve(FileType.Godot);
 

@@ -96,7 +96,6 @@ function createLogStatement(editor) {
 function getFileType(editor) {
     return __awaiter(this, void 0, void 0, function* () {
         let langId = editor.document.languageId;
-        console.log("&&& langId: " + langId);
         if (langId === "gdscript")
             return Promise.resolve(FileType.Godot);
         if (langId === "typescript" || langId === "javascript")
